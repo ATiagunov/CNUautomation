@@ -1,8 +1,6 @@
 from logging import Filter
 from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-from dotenv import load_dotenv
-import os
 
 TOKEN = '5801504689:AAGVBwC22GT9oV23t56X_ueBrNo_oCV4p4g'
 BOT_USERNAME = 'https://t.me/CNU_dispatch_bot'
@@ -10,11 +8,6 @@ BOT_USERNAME = 'https://t.me/CNU_dispatch_bot'
 # you will need the groub_b_id saved as a global variable or
 # in some other document
 group_b_id = -1001961687786
-
-# create the bot, updater, and dispatcher
-bot = telegram.Bot(TOKEN)
-# updater = Updater(TOKEN)
-# dp = updater.dispatcher
 
 # Lets us use the /start command
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
