@@ -1,135 +1,58 @@
-from logging import Filter
-from telegram import Update, Bot
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import re
+import states_abbr
+from geopy.geocoders import Nominatim
+from datetime import date
 
-TOKEN = '5801504689:AAGVBwC22GT9oV23t56X_ueBrNo_oCV4p4g'
-BOT_USERNAME = 'https://t.me/CNU_dispatch_bot'
+geolocator = Nominatim(user_agent = "CNU")
 
-# you will need the groub_b_id saved as a global variable or
-# in some other document
-group_b_id = -1001961687786
+#Initial
+pick_loc = del_loc = ""
+today = date.today()
+miles = pieces = weight = 0
+dims = "NO DIMENSIONS SPECIFIED"
 
-# Lets us use the /start command
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Hello there! I\'m a CNU bot.')
-
-
-# Lets us use the /help command
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
-    await update.message.reply_text("This chat's id is: " + str(chat_id))
-
-
-# Lets us use the /custom command
-async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('This is a custom command, you can add whatever text you want here.')
-
-
-def handle_response(text: str) -> str:
-    # Create your own response logic
-    processed: str = text.lower()
-
-    if 'hello' in processed:
-        return 'Hey there!'
-
-    if 'how are you' in processed:
-        return 'I\'m good!'
-
-    return 'I don\'t understand'
-
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Get basic info of the incoming message
-    message_type: str = update.message.chat.type
-    text: str = update.message.text
-
-    # Print a log for debugging
-    print(f'User ({update.message.chat.id}) in {message_type}: "{text}"')
-
-    # React to group messages only if users mention the bot directly
-    if message_type == 'group':
-        # Replace with your bot username
-        if BOT_USERNAME in text:
-            new_text: str = text.replace(BOT_USERNAME, '').strip()
-            response: str = handle_response(new_text)
-        else:
-            return  # We don't want the bot respond if it's not mentioned in the group
+def get_locations(txt_in):
+    zip_code = "\s+\d{5}\s+"
+    city_state = "\w+\,?\s\w{2}\,?"
+    proper_addr = re.findall(city_state + zip_code, txt_in)
+    global pick_loc, del_loc
+    if (len(proper_addr) == 2):
+        pick_loc = proper_addr[0].strip()
+        del_loc = proper_addr[1].strip()
     else:
-        response: str = handle_response(text)
-
-    # Reply normal if the message is in private
-    print('Bot:', response)
-    await update.message.reply_text(response)
-
-
-# Log errors
-async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f'Update {update} caused error {context.error}')
+        zip_codes = re.findall(zip_code, txt_in)
+        if (zip_codes):
+            pickup_zip = zip_codes[0].strip()
+            delivery_zip = zip_codes[1].strip()
+            pick_loc = geolocator.geocode(query={'postalcode': pickup_zip, 'country' : 'US'})
+            del_loc = geolocator.geocode(query={'postalcode': delivery_zip, 'country' : 'US'})
 
 
-async def get_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # gets the chat_id of the current chat
-    chat_id = update.effective_chat.id
-    await update.message.reply_text("This chat's id is: " + str(chat_id))
+#Parse data
+with open("test/a.txt", "r") as in_txt:
+    read_content = in_txt.read()
+    get_locations(read_content)
+#   get_dates()
+#   get_mileage()
+#   get_pieces()
+#   get_weight_dims
+#   get_vehicle_type()
 
-async def auto_forward(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # automatically forwards messages from this chat to
-    # chat_b
-    
-    # global bot, group_b_id
-    chat_id = update.effective_chat.id
-    username = update.effective_message.from_user.name
-    chat_title = update.effective_message.chat.title
-    msg_txt = update.effective_message.text
-    telegram.Bot.forw()
-    bot.send_message(
-        group_b_id, 
-        text=f"'{msg_txt}'\nwas just sent in chat {chat_title} by {username}"
-    )
-    
-def auto_forward_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # get variables
-    global bot, group_b_id
-    chat_id = update.effective_chat.id
-    username = update.effective_message.from_user.name
-    chat_title = update.effective_message.chat.title
-    
-    # get the third best quality photo
-    photos = len(update.message.photo)
-    img_index = max(photos-3, 0) # change -3 to -2 to get second best etc
-    img = update.message.photo[img_index]
-    
-    # send message to GroupB the group that you want the stuff forwarded to
-    bot.send_message(group_b_id, str(username) + " just sent me an image from the `" + str(chat_title) + "` chat:")
-    bot.send_photo(group_b_id, img)
-        
+#get mileage
+# pick_loc_coord = (pick_loc.latitude, pick_loc.longitude)
+# del_loc_coord = (del_loc.latitude, del_loc.longitude)
+# print(distance.distance(pick_loc_coord, del_loc_coord).miles)
 
-
-
-# # Start the Bot
-# updater.start_polling()
-# updater.idle()
-
-# Run the program
-if __name__ == '__main__':
-    app = Application.builder().token(TOKEN).build()
-
-    # Commands
-    app.add_handler(CommandHandler('start', start_command))
-    app.add_handler(CommandHandler('help', help_command))
-    app.add_handler(CommandHandler('custom', custom_command))
-
-    # Forwarding
-    app.add_handler(CommandHandler('get_chat_id', get_chat_id))
-    # app.add_handler(MessageHandler(filters.Text, auto_forward))
-    # app.add_handler(MessageHandler(filters._Photo, auto_forward_image))
-
-    # Messages
-    app.add_handler(MessageHandler(filters.TEXT, handle_message))
-
-    # Log all errors
-    app.add_error_handler(error)
-
-    print('Polling...')
-    # Run the bot
-    app.run_polling(poll_interval=5)
+#Fill the output file
+if (len(pick_loc) and len(del_loc)):
+    with open("test/output.txt", "w+") as out_txt:
+        out_txt.write(f'Pick-up at: {pick_loc} \n')
+        out_txt.write(f'Pick-up date (EST): {today} \n\n')
+        out_txt.write(f'Deliver to: {del_loc} \n')
+        out_txt.write(f'Delivery date (EST): {today} \n\n')
+        out_txt.write(f'Miles: {miles} \n')
+        out_txt.write(f'Pieces: {pieces} \n')
+        out_txt.write(f'Weight: {weight} \n')
+        out_txt.write(f'Dims: {dims} \n')
+else:
+    print("No zip codes provided")
