@@ -1,0 +1,10 @@
+Pick-up at: Houston, TX 77032 
+Pick-up date (EST): 08/02/2023 
+
+Deliver to: Brownsville, TX 78521 
+Delivery date (EST): 08/02/2023 
+
+Miles: 1 
+Pieces: 2 
+Weight: 1 
+Dims: 10 x 10 x 10 

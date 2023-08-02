@@ -1,0 +1,23 @@
+Pick-Up:
+
+Boston, MA, US 08/02/2023 15:00 local
+
+Delivery:
+
+Miami, FL, US 08/04/2023 08:00 local
+
+Loaded miles:
+
+1498 mi
+
+Comments:
+
+OMNI team drivers true dock high
+
+Vehicle types:
+
+Large Straight
+
+Total weight:
+
+700 lb
