@@ -7,7 +7,7 @@ from datetime import datetime
 geolocator = Nominatim(user_agent = "CNU")
 
 #Initial
-source = "test/c.txt"
+source = "test/d.txt"
 pick_loc = del_loc = ""
 pick_date  = del_date = date.today().strftime('%m/%d/%Y')
 miles = pieces = weight = 1
@@ -33,11 +33,13 @@ def get_locations(txt_in):
             city_states_raw = re.findall(city_state, txt_in)
             if (city_states_raw != None):
                 city_state_only = "^\w+\,?\s[A-Z]{2}\,?$"
+                res_list = []
                 for str in city_states_raw:
                     if re.match(city_state_only, str):
-                        print(str)
-                # pick_loc = city_states[0].strip()
-                # del_loc = city_states[1].strip()
+                        res_list.append(str)
+                if (len(res_list) == 2):        
+                    pick_loc = res_list[0]
+                    del_loc = res_list[1]
         
 
 def get_dates(txt_in):
@@ -58,11 +60,25 @@ def get_pieces(txt_in):
         pieces = re.search("\d+", line_with_pcs[0])[0]
 
 def get_dims(txt_in):
-    dims_x = "\d+\s*x\s*\d+\s*x\s*\d+"
+    dims_x = "\d+\.?\d?\s*x\s*\d+\.?\d?\s*x\s*\d+\.?\d?"
     line_with_dims = re.search(dims_x, txt_in)
     global dims
     if (line_with_dims != None):
         dims = line_with_dims[0]
+
+def get_weight(txt_in):
+    weight_lbs = "\d+\s*lbs"
+    weight_found = re.search(weight_lbs, txt_in)
+    global weight
+    if (weight_found != None):
+        weight = weight_found[0]
+
+def get_mileage(txt_in):
+    miles_mask = "(?::((M|m)iles.*\d+)|(\d+\s*mi))"
+    miles_found = re.search(miles_mask, txt_in)
+    global miles
+    if (miles_found != None):
+        miles = miles_found[0]
     
                    
 #Parse data
@@ -72,7 +88,8 @@ with open(source, "r") as in_txt:
     get_dates(read_content)
     get_pieces(read_content)
     get_dims(read_content)
-#   get_mileage()
+    get_weight(read_content)
+    get_mileage(read_content)
 
 #get mileage
 # pick_loc_coord = (pick_loc.latitude, pick_loc.longitude)
