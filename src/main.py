@@ -2,8 +2,9 @@ import toSelectus
 
 
 def main():
-    source = 'test/c.txt'
+    source = 'test/a.txt'
     toSelectus.transform(source)
 
+    
 if __name__ == '__main__':
     main()

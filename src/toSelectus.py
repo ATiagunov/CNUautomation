@@ -1,41 +1,40 @@
+from datetime import date
 import re
 import pgeocode
-from datetime import date
-from datetime import datetime
 
+# Initial
+source = "test/a.txt"
 
-
-#Initial
-source = "test/c.txt"
 pick_loc = del_loc = ""
-pick_date  = del_date = date.today().strftime('%m/%d/%Y')
+pick_date = del_date = date.today().strftime('%m/%d/%Y')
 pick_time = del_time = '08:00 AM'
 miles = pieces = weight = 1
 dims = "NO DIMENSIONS SPECIFIED"
 
-def get_location_from_zipcode(zipcode):
-    data = pgeocode.Nominatim('US')
-    full_location = ""
 
+def get_location_from_zipcode(zipcode):
+
+    full_location = ""
+    data = pgeocode.Nominatim('US')
     retrieved = data.query_postal_code(zipcode)
     full_location = f'{retrieved.place_name}, {retrieved.state_code} {retrieved.postal_code}'
     return full_location
+
 
 def get_locations(txt_in):
     zip_code = "\s+\d{5}\s+"
     city_state = "\w+\,?\s\w{2}\,?"
     proper_addr = re.findall(city_state + zip_code, txt_in)
     global pick_loc, del_loc
-    
     if (proper_addr != None and len(proper_addr) == 2):
         pick_loc = proper_addr[0].strip()
         del_loc = proper_addr[1].strip()
     else:
         zip_codes = re.findall(zip_code, txt_in)
-        
         if (zip_codes != None and len(zip_codes) == 2):
             pick_loc = get_location_from_zipcode(zip_codes[0].strip())
             del_loc = get_location_from_zipcode(zip_codes[1].strip())
+
         else:
             city_states_raw = re.findall(city_state, txt_in)
             if (city_states_raw != None):
@@ -43,12 +42,13 @@ def get_locations(txt_in):
                 res_list = []
                 for str in city_states_raw:
                     if re.match(city_state_only, str):
-                        if (str[len(str)-1] == ','): str = str[:len(str)-1]
+                        if (str[len(str)-1] == ','):
+                            str = str[:len(str)-1]
                         res_list.append(str)
-                if (len(res_list) == 2):        
+                if (len(res_list) == 2):
                     pick_loc = res_list[0]
                     del_loc = res_list[1]
-        
+
 
 def get_dates(txt_in):
     multi_date = "\d+\s*(?:\/|-|\.)\s*\d+\s*(?:\/|-|\.)\s*\d+"
@@ -57,7 +57,8 @@ def get_dates(txt_in):
     if (proper_addr != None and len(proper_addr) == 2):
         pick_date = proper_addr[0].strip()
         del_date = proper_addr[1].strip()
-        
+
+
 def get_times(txt_in):
     time_mask = "(?:[0-1]?[0-9]|2[0-3]):[0-5][0-9]"
     found_times = re.findall(time_mask, txt_in)
@@ -66,12 +67,14 @@ def get_times(txt_in):
         pick_time = found_times[0]
         del_time = found_times[1]
 
+
 def get_pieces(txt_in):
     pcs_before_at = "\d+\s+@"
     line_with_pcs = re.search(pcs_before_at, txt_in)
     global pieces
     if (line_with_pcs != None):
         pieces = re.search("\d+", line_with_pcs[0])[0]
+
 
 def get_dims(txt_in):
     dims_x = "\d+\.?\d?\s*x\s*\d+\.?\d?\s*x\s*\d+\.?\d?"
@@ -80,6 +83,7 @@ def get_dims(txt_in):
     if (line_with_dims != None):
         dims = line_with_dims[0]
 
+
 def get_weight(txt_in):
     weight_lbs = "\d+\s*lbs?"
     weight_found = re.search(weight_lbs, txt_in)
@@ -87,25 +91,28 @@ def get_weight(txt_in):
     if (weight_found):
         weight = weight_found[0]
 
+
 def get_mileage(txt_in):
     miles_mask = "(?:([M|m]iles.*\d+)|(\d+\s*mi))"
     miles_found = re.search(miles_mask, txt_in)
     global miles
     if (miles_found != None):
         miles = miles_found[0]
-    
+
+
 def parse_data(source_txt):
     with open(source_txt, "r") as in_txt:
         read_content = in_txt.read()
+        get_mileage(read_content)
         get_locations(read_content)
         get_dates(read_content)
         get_times(read_content)
         get_pieces(read_content)
         get_dims(read_content)
         get_weight(read_content)
-        get_mileage(read_content)
 
-#Fill the output file
+
+# Fill the output file
 def fill_output():
     if (len(pick_loc) and len(del_loc)):
         with open("test/output.txt", "w+") as out_txt:
@@ -120,6 +127,7 @@ def fill_output():
     else:
         print("No zip codes provided")
 
-def transform(source = "test/a.txt"):
+
+def transform(source="test/a.txt"):
     parse_data(source)
     fill_output()
