@@ -2,7 +2,7 @@ import toSelectus
 
 
 def main():
-    source = 'test/d.txt'
+    source = 'test/e.txt'
     toSelectus.transform(source)
 
     

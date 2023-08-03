@@ -38,7 +38,7 @@ def get_locations(txt_in):
         else:
             city_states_raw = re.findall(city_state, txt_in)
             if (city_states_raw != None):
-                city_state_only = "^\w+\,?\s[A-Z]{2}\,?$"
+                city_state_only = "^[A-Za-z]+\,?\s[A-Z]{2}\,?$"
                 res_list = []
                 for str in city_states_raw:
                     if re.match(city_state_only, str):
@@ -77,7 +77,7 @@ def get_pieces(txt_in):
 
 
 def get_dims(txt_in):
-    dims_x = "\d+\.?\d?\s*x\s*\d+\.?\d?\s*x\s*\d+\.?\d?"
+    dims_x = "\d+\.?\d?\s*[X|x]\s*\d+\.?\d?\s*[X|x]\s*\d+\.?\d?"
     line_with_dims = re.search(dims_x, txt_in)
     global dims
     if (line_with_dims != None):
@@ -125,7 +125,7 @@ def fill_output():
             out_txt.write(f'Weight: {weight} \n')
             out_txt.write(f'Dims: {dims} \n')
     else:
-        print("No zip codes provided")
+        print("Location wasn't found")
 
 
 def transform(source="test/a.txt"):
