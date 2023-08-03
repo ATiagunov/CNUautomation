@@ -85,8 +85,8 @@ def get_dims(txt_in):
 
 
 def get_weight(txt_in):
-    weight_lbs = "\d+\s*lbs?"
-    weight_found = re.search(weight_lbs, txt_in)
+    weight_lbs = "\d+(\.\d+)?\s*lbs?"
+    weight_found = re.search(weight_lbs, txt_in, re.IGNORECASE)
     global weight
     if (weight_found):
         weight = weight_found[0]
