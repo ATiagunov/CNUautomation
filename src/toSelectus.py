@@ -23,8 +23,15 @@ def get_location_from_zipcode(zipcode):
 
 def get_locations(txt_in):
     zip_code = "\s+\d{5}\s+"
-    city_state = "\w+\,?\s\w{2}\,?"
-    proper_addr = re.findall(city_state + zip_code, txt_in)
+    state_codes = [ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
+           'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
+           'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
+           'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
+           'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY']
+    
+    states = "(" + ")|(".join(state_codes) + ")"
+    city_state = "\w+\,?\s" + states
+    proper_addr = re.findall(city_state + zip_code, txt_in, re.IGNORECASE)
     global pick_loc, del_loc
     if (proper_addr != None and len(proper_addr) == 2):
         pick_loc = proper_addr[0].strip()
@@ -41,6 +48,7 @@ def get_locations(txt_in):
                 city_state_only = "^[A-Za-z]+\,?\s[A-Z]{2}\,?$"
                 res_list = []
                 for str in city_states_raw:
+                    print(str)
                     if re.match(city_state_only, str):
                         if (str[len(str)-1] == ','):
                             str = str[:len(str)-1]
@@ -69,8 +77,8 @@ def get_times(txt_in):
 
 
 def get_pieces(txt_in):
-    pcs_before_at = "\d+\s+@"
-    line_with_pcs = re.search(pcs_before_at, txt_in)
+    pcs_before_at = "\d+\s+[@|crt]"
+    line_with_pcs = re.search(pcs_before_at, txt_in, re.IGNORECASE)
     global pieces
     if (line_with_pcs != None):
         pieces = re.search("\d+", line_with_pcs[0])[0]
