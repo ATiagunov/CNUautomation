@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 import re
 import pgeocode
 
@@ -6,7 +6,8 @@ import pgeocode
 source = "test/a.txt"
 
 pick_loc = del_loc = ""
-pick_date = del_date = date.today().strftime('%m/%d/%Y')
+pick_date = date.today().strftime('%m/%d/%Y')
+del_date = (date.today() + timedelta(days=1)).strftime('%m/%d/%Y')
 pick_time = del_time = '08:00 AM'
 miles = pieces = weight = 1
 dims = "NO DIMENSIONS SPECIFIED"
@@ -23,14 +24,7 @@ def get_location_from_zipcode(zipcode):
 
 def get_locations(txt_in):
     zip_code = "\s+\d{5}\s+"
-    state_codes = [ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
-           'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
-           'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
-           'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
-           'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY']
-    
-    states = "(" + ")|(".join(state_codes) + ")"
-    city_state = "\w+\,?\s" + states
+    city_state = "\w{3,}\,?\s+(?:AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VT|WA|WI|WV|WY)(?:\s+|\,)"
     proper_addr = re.findall(city_state + zip_code, txt_in, re.IGNORECASE)
     global pick_loc, del_loc
     if (proper_addr != None and len(proper_addr) == 2):
@@ -43,13 +37,13 @@ def get_locations(txt_in):
             del_loc = get_location_from_zipcode(zip_codes[1].strip())
 
         else:
-            city_states_raw = re.findall(city_state, txt_in)
+            city_states_raw = re.findall(city_state, txt_in, re.IGNORECASE)
             if (city_states_raw != None):
-                city_state_only = "^[A-Za-z]+\,?\s[A-Z]{2}\,?$"
+                city_state_only = "^[A-Z]+\,?\s[A-Z]{2}\,?"
                 res_list = []
                 for str in city_states_raw:
-                    print(str)
-                    if re.match(city_state_only, str):
+                    str = str.strip()
+                    if re.match(city_state_only, str, re.IGNORECASE):
                         if (str[len(str)-1] == ','):
                             str = str[:len(str)-1]
                         res_list.append(str)

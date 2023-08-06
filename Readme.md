@@ -1,10 +1,10 @@
 # To selectus
 
-Script to transfer raw load info to selectus look 
+Script to transform raw load info to selectus look 
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install libraries.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install dependencies.
 
 ```bash
 pip install regex
