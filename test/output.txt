@@ -1,10 +1,10 @@
-Pick-up at: Lawrenceville GA 
-Pick-up date (EST): 08/05/2023 08:00 AM 
+Pick-up at: Splendora, TX 
+Pick-up date (EST): 09/14/2023 08:00 AM 
 
-Deliver to: Menomonie WI 
-Delivery date (EST): 08/06/2023 08:00 AM 
+Deliver to: Morris, PA 
+Delivery date (EST): 09/15/2023 08:00 AM 
 
 Miles: 1 
-Pieces: 3 
-Weight: 1867 lbs 
-Dims: 31.5 x 38.5 x 47.5 
+Pieces: 1 
+Weight: 500 lbs 
+Dims: NO DIMENSIONS SPECIFIED 
