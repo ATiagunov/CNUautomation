@@ -17,12 +17,11 @@ class Widget(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setStyleSheet("""QTextEdit { 	font: 20px verdana;
+    background-color: white;
+    color: black; }
+    """)
     widget = Widget()
     widget.show()
     sys.exit(app.exec())
 
-
-#    def transform_txt():
-#        textEdit.setText('Transformed')
-
-#pushButton.clicked.connect(transform_txt)

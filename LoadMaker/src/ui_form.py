@@ -48,9 +48,6 @@ class Ui_Widget(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.textEdit = QTextEdit(self.gridFrame)
         self.textEdit.setObjectName(u"textEdit")
-        self.textEdit.setFrameShape(QFrame.HLine)
-        self.textEdit.setFrameShadow(QFrame.Plain)
-        self.textEdit.setLineWidth(1)
 
         self.verticalLayout.addWidget(self.textEdit)
 
