@@ -1,0 +1,17 @@
+{
+    "files": [
+        "src/form.ui",
+        "src/main.py",
+        "src/toSelectus.py",
+        "src/ui_form.py",
+        "test/a.txt",
+        "test/b.txt",
+        "test/c.txt",
+        "test/d.txt",
+        "test/e.txt",
+        "test/f.txt",
+        "test/g.txt",
+        "test/h.txt",
+        "test/output.txt"
+    ]
+}

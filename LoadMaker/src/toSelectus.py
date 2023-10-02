@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 import re
-import pgeocode
+#import pgeocode
 
 # Initial
 source = "test/a.txt"
@@ -16,9 +16,9 @@ dims = "NO DIMENSIONS SPECIFIED"
 def get_location_from_zipcode(zipcode):
 
     full_location = ""
-    data = pgeocode.Nominatim('US')
-    retrieved = data.query_postal_code(zipcode)
-    full_location = f'{retrieved.place_name}, {retrieved.state_code} {retrieved.postal_code}'
+#    data = pgeocode.Nominatim('US')
+#    retrieved = data.query_postal_code(zipcode)
+#    full_location = f'{retrieved.place_name}, {retrieved.state_code} {retrieved.postal_code}'
     return full_location
 
 
@@ -102,9 +102,7 @@ def get_mileage(txt_in):
         miles = miles_found[0]
 
 
-def parse_data(source_txt):
-    with open(source_txt, "r") as in_txt:
-        read_content = in_txt.read()
+def parse_data(read_content):
         get_mileage(read_content)
         get_locations(read_content)
         get_dates(read_content)
@@ -117,19 +115,20 @@ def parse_data(source_txt):
 # Fill the output file
 def fill_output():
     if (len(pick_loc) and len(del_loc)):
-        with open("test/output.txt", "w+") as out_txt:
-            out_txt.write(f'Pick-up at: {pick_loc} \n')
-            out_txt.write(f'Pick-up date (EST): {pick_date} {pick_time} \n\n')
-            out_txt.write(f'Deliver to: {del_loc} \n')
-            out_txt.write(f'Delivery date (EST): {del_date} {del_time} \n\n')
-            out_txt.write(f'Miles: {miles} \n')
-            out_txt.write(f'Pieces: {pieces} \n')
-            out_txt.write(f'Weight: {weight} \n')
-            out_txt.write(f'Dims: {dims} \n')
+        result = f"""Pick-up at: {pick_loc}
+Pick-up date (EST): {pick_date} {pick_time}
+Deliver to: {del_loc}
+Delivery date (EST): {del_date} {del_time}
+Miles: {miles}
+Pieces: {pieces}
+Weight: {weight}
+Dims: {dims}
+        """
+        return result
     else:
-        print("Location wasn't found")
+        return "Location wasn't found"
 
 
 def transform(source="test/a.txt"):
     parse_data(source)
-    fill_output()
+    return fill_output()
