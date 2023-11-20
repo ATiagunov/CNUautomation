@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 import re
-#import pgeocode
+import pgeocode
 
 # Initial
 source = "test/a.txt"
@@ -16,9 +16,9 @@ dims = "NO DIMENSIONS SPECIFIED"
 def get_location_from_zipcode(zipcode):
 
     full_location = ""
-#    data = pgeocode.Nominatim('US')
-#    retrieved = data.query_postal_code(zipcode)
-#    full_location = f'{retrieved.place_name}, {retrieved.state_code} {retrieved.postal_code}'
+    data = pgeocode.Nominatim('US')
+    retrieved = data.query_postal_code(zipcode)
+    full_location = f'{retrieved.place_name}, {retrieved.state_code} {retrieved.postal_code}'
     return full_location
 
 
@@ -119,6 +119,7 @@ def fill_output():
 Pick-up date (EST): {pick_date} {pick_time}
 Deliver to: {del_loc}
 Delivery date (EST): {del_date} {del_time}
+
 Miles: {miles}
 Pieces: {pieces}
 Weight: {weight}
