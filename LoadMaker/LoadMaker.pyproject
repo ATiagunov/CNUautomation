@@ -8,6 +8,7 @@
         "test/a.txt",
         "test/OMNI/1.txt",
         "test/ECHO",
-        "test/output.txt"
+        "test/output.txt",
+        "style.qrc"
     ]
 }

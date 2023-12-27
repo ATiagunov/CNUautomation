@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>style/cnu.ico</file>
+    </qresource>
+</RCC>

@@ -19,8 +19,6 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QPlainTextEdit
     QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
     QWidget)
 
-import toSelectus
-
 class Ui_Widget(object):
     def setupUi(self, Widget):
         if not Widget.objectName():
@@ -68,7 +66,7 @@ class Ui_Widget(object):
 
 
         self.gridLayout_2.addWidget(self.gridFrame, 0, 0, 1, 1)
-        self.pushButton.clicked.connect(self.transform_txt)
+
 
         self.retranslateUi(Widget)
 
@@ -80,7 +78,3 @@ class Ui_Widget(object):
         self.pushButton.setText(QCoreApplication.translate("Widget", u"Transform", None))
     # retranslateUi
 
-    def transform_txt(self):
-        raw_txt = self.plainTextEdit.toPlainText()
-        result = toSelectus.transform(raw_txt)
-        self.plainTextEdit.setPlainText(result)
