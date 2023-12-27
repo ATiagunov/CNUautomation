@@ -1,11 +1,10 @@
 from datetime import date, timedelta
-import re
-import pgeocode
+import re, MapBox
 
 # Initial
 source = "test/a.txt"
 
-pick_loc = del_loc = ""
+origin_geocode = destination_geocode = []
 pick_date = date.today().strftime('%m/%d/%Y')
 del_date = (date.today() + timedelta(days=1)).strftime('%m/%d/%Y')
 pick_time = del_time = '08:00 AM'
@@ -13,43 +12,31 @@ miles = pieces = weight = 1
 dims = "NO DIMENSIONS SPECIFIED"
 
 
-def get_location_from_zipcode(zipcode):
-
-    full_location = ""
-    data = pgeocode.Nominatim('US')
-    retrieved = data.query_postal_code(zipcode)
-    full_location = f'{retrieved.place_name}, {retrieved.state_code} {retrieved.postal_code}'
-    return full_location
-
-
-def get_locations(txt_in):
+def get_geocode(txt_in):
+    global origin_geocode, destination_geocode
+    best_query = []
     zip_code = "\s+\d{5}\s+"
-    city_state = "\w{3,}\,?\s+(?:AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VT|WA|WI|WV|WY)(?:\s+|\,)"
-    proper_addr = re.findall(city_state + zip_code, txt_in, re.IGNORECASE)
-    global pick_loc, del_loc
-    if (proper_addr != None and len(proper_addr) == 2):
-        pick_loc = proper_addr[0].strip()
-        del_loc = proper_addr[1].strip()
+    zip_codes = re.findall(zip_code, txt_in)
+    #if zip codes found - best query
+    if (zip_codes != None and len(zip_codes) == 2):
+        best_query = zip_codes
+    
+    #otherwise checking city and state info
     else:
-        zip_codes = re.findall(zip_code, txt_in)
-        if (zip_codes != None and len(zip_codes) == 2):
-            pick_loc = get_location_from_zipcode(zip_codes[0].strip())
-            del_loc = get_location_from_zipcode(zip_codes[1].strip())
+        city_state = "(?:[A-Z][a-z]+\s)*[A-Z][a-z]+\,?\s(?i:AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VT|WA|WI|WV|WY)(?:\s|\,)"
+        city_states = re.findall(city_state, txt_in)
+        if (city_states != None):
+            if (len(city_states) == 2):
+                best_query = city_states
+            #need better solution
+            elif(len(city_states) > 2):
+                origin_geocode = MapBox.get_geocode(city_states[1])
+                destination_geocode = MapBox.get_geocode(city_states[2])
 
-        else:
-            city_states_raw = re.findall(city_state, txt_in, re.IGNORECASE)
-            if (city_states_raw != None):
-                city_state_only = "^[A-Z]+\,?\s[A-Z]{2}\,?"
-                res_list = []
-                for str in city_states_raw:
-                    str = str.strip()
-                    if re.match(city_state_only, str, re.IGNORECASE):
-                        if (str[len(str)-1] == ','):
-                            str = str[:len(str)-1]
-                        res_list.append(str)
-                if (len(res_list) == 2):
-                    pick_loc = res_list[0]
-                    del_loc = res_list[1]
+                
+    if(best_query):
+        origin_geocode = MapBox.get_geocode(best_query[0])
+        destination_geocode = MapBox.get_geocode(best_query[1])
 
 
 def get_dates(txt_in):
@@ -98,26 +85,30 @@ def get_mileage(txt_in):
     miles_mask = "(?:([M|m]iles.*\d+)|(\d+\s*mi))"
     miles_found = re.search(miles_mask, txt_in)
     global miles
-    if (miles_found != None):
-        miles = miles_found[0]
+    if (miles_found):
+        miles = miles_found[0].split(' ', 1)[0]
+    elif (origin_geocode and destination_geocode):
+        miles = f'{MapBox.get_mileage(origin_geocode[1], destination_geocode[1]):g}'
+
 
 
 def parse_data(read_content):
-        get_mileage(read_content)
-        get_locations(read_content)
-        get_dates(read_content)
-        get_times(read_content)
-        get_pieces(read_content)
-        get_dims(read_content)
-        get_weight(read_content)
+        get_geocode(read_content)
+        if (origin_geocode and destination_geocode):
+            get_mileage(read_content)
+            get_dates(read_content)
+            get_times(read_content)
+            get_pieces(read_content)
+            get_dims(read_content)
+            get_weight(read_content)
 
 
 # Fill the output file
 def fill_output():
-    if (len(pick_loc) and len(del_loc)):
-        result = f"""Pick-up at: {pick_loc}
+    if (origin_geocode and destination_geocode):
+        result = f"""Pick-up at: {origin_geocode[0]}
 Pick-up date (EST): {pick_date} {pick_time}
-Deliver to: {del_loc}
+Deliver to: {destination_geocode[0]}
 Delivery date (EST): {del_date} {del_time}
 
 Miles: {miles}
@@ -133,3 +124,15 @@ Dims: {dims}
 def transform(source="test/a.txt"):
     parse_data(source)
     return fill_output()
+
+test = """Please provide options for the following
+Driver must be US Citizen or GC Holder
+
+Pickup 2pm
+Grand Rapids Mi
+
+Deliver direct
+Milwaukee WI
+
+2 @ 10 x 10 x 10"""
+transform(test)
