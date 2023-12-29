@@ -9,6 +9,7 @@
         "test/OMNI/1.txt",
         "test/ECHO",
         "test/output.txt",
+        "rc_style.py",
         "style.qrc"
     ]
 }

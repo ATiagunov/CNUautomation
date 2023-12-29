@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'form.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.3
+## Created by: Qt User Interface Compiler version 6.5.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -19,6 +19,9 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QPlainTextEdit
     QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
     QWidget)
 
+import toSelectus
+
+
 class Ui_Widget(object):
     def setupUi(self, Widget):
         if not Widget.objectName():
@@ -29,6 +32,9 @@ class Ui_Widget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Widget.sizePolicy().hasHeightForWidth())
         Widget.setSizePolicy(sizePolicy)
+        icon = QIcon()
+        icon.addFile(u"../style/cnu.ico", QSize(), QIcon.Normal, QIcon.Off)
+        Widget.setWindowIcon(icon)
         self.gridLayout_2 = QGridLayout(Widget)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridFrame = QFrame(Widget)
@@ -58,7 +64,7 @@ class Ui_Widget(object):
         self.pushButton = QPushButton(self.gridFrame)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setMinimumSize(QSize(0, 30))
-
+        self.pushButton.clicked.connect(self.transform_txt)
         self.verticalLayout.addWidget(self.pushButton)
 
 
@@ -74,7 +80,14 @@ class Ui_Widget(object):
     # setupUi
 
     def retranslateUi(self, Widget):
-        Widget.setWindowTitle(QCoreApplication.translate("Widget", u"Widget", None))
+        Widget.setWindowTitle(QCoreApplication.translate("Widget", u"Load Maker", None))
         self.pushButton.setText(QCoreApplication.translate("Widget", u"Transform", None))
     # retranslateUi
+
+    def transform_txt(self):
+           raw_txt = self.plainTextEdit.toPlainText()
+           self.plainTextEdit.clear()
+           result = toSelectus.transform(raw_txt)
+           self.plainTextEdit.setPlainText(result)
+
 

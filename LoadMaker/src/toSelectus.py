@@ -1,9 +1,6 @@
 from datetime import date, timedelta
 import re, MapBox
 
-# Initial
-source = "test/a.txt"
-
 origin_geocode = destination_geocode = []
 pick_date = date.today().strftime('%m/%d/%Y')
 del_date = (date.today() + timedelta(days=1)).strftime('%m/%d/%Y')
@@ -15,7 +12,7 @@ dims = "NO DIMENSIONS SPECIFIED"
 def get_geocode(txt_in):
     global origin_geocode, destination_geocode
     best_query = []
-    zip_code = "\s+\d{5}\s+"
+    zip_code = "\s+\(?\d{5}\)?\,?\s+"
     zip_codes = re.findall(zip_code, txt_in)
     #if zip codes found - best query
     if (zip_codes != None and len(zip_codes) == 2):
@@ -82,12 +79,8 @@ def get_weight(txt_in):
 
 
 def get_mileage(txt_in):
-    miles_mask = "(?:([M|m]iles.*\d+)|(\d+\s*mi))"
-    miles_found = re.search(miles_mask, txt_in)
     global miles
-    if (miles_found):
-        miles = miles_found[0].split(' ', 1)[0]
-    elif (origin_geocode and destination_geocode):
+    if (origin_geocode and destination_geocode):
         miles = f'{MapBox.get_mileage(origin_geocode[1], destination_geocode[1]):g}'
 
 
@@ -121,18 +114,7 @@ Dims: {dims}
         return "Location wasn't found"
 
 
-def transform(source="test/a.txt"):
+def transform(source):
+#    if (len(source) > 0):
     parse_data(source)
     return fill_output()
-
-test = """Please provide options for the following
-Driver must be US Citizen or GC Holder
-
-Pickup 2pm
-Grand Rapids Mi
-
-Deliver direct
-Milwaukee WI
-
-2 @ 10 x 10 x 10"""
-transform(test)

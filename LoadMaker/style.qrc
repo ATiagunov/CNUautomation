@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>style/cnu.ico</file>
+        <file>style/cnu_logistics_llc_logo.png</file>
     </qresource>
 </RCC>
