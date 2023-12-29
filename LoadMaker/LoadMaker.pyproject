@@ -10,6 +10,7 @@
         "test/ECHO",
         "test/output.txt",
         "rc_style.py",
-        "style.qrc"
+        "style.qrc",
+        "src/ui_methods.py"
     ]
 }
